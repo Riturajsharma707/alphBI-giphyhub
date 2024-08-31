@@ -14,8 +14,15 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/config";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Signin = () => {
+  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  const router = useRouter();
+
   const formSchema = z.object({
     email: z.string().email({
       message: "Enter valid email address",
@@ -31,9 +38,42 @@ const Signin = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        values.email,
+        values.password
+      )
+        .then((res) => {
+          toast.success("Successfully login");
+          localStorage.setItem("email", values.email);
+          router.push("/");
+          console.log(res);
+        })
+        .catch((error) => {
+          toast.error("Login failed");
+          console.log(error);
+        });
+    } catch (error) {
+      toast.error("catch error");
+      console.log(error);
+    }
+
+    // try {
+    //   const user = await signInWithEmailAndPassword(
+    //     values.email,
+    //     values.password
+    //   );
+    //   toast.success("Login successfull");
+    //   localStorage.setItem("email", values.email);
+    //   router.push("/");
+    //   console.log({ user });
+    // } catch (error) {
+    //   toast.error("Signing failed");
+    //   console.log(error);
+    // }
+    // console.log(values);
+  };
 
   return (
     <div className="w-full p-4 items-center bg-pink-50 min-h-screen">

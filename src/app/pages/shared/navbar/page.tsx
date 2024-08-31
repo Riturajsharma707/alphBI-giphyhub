@@ -1,9 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
+  const [user, setUser] = useState<String>("");
+
+  useEffect(() => {
+    const userName = localStorage.getItem("name");
+    console.log(userName);
+  }, []);
 
   return (
     <div className="w-full fixed p-3 top-0 item-center text-center bg-slate-700 text-white h-20 flex justify-between ">
@@ -23,7 +29,7 @@ const Navbar = () => {
           href="/pages/auth/signin"
           className="hover:text-blue-300 active:text-yellow-500"
         >
-          Login
+          {user ? user : "Login"}
         </Link>
       </div>
 
