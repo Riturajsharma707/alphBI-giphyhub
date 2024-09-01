@@ -3,26 +3,21 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { Inter } from "next/font/google";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import Loading from "@/components/ui/loading";
+import { toast } from "react-toastify";
+import heartSVG from "../../../../public/addFavorite.svg";
+import favoriteGIF from "../../../../public/favorites.svg";
 
 interface card {
   id: number;
@@ -31,45 +26,100 @@ interface card {
   username: string;
 }
 
+const inter = Inter({
+  weight: ["500", "700"],
+
+  subsets: ["latin-ext"],
+});
+
 const Homepage = () => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState<card[]>([]);
+  const [loader, setLoader] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+
+  const lastItemIndex = currentPage * itemsPerPage;
+  const firstItemIndex = lastItemIndex - itemsPerPage;
+  const currentItems = data.slice(firstItemIndex, lastItemIndex);
+
+  const favSVG = (
+    <svg
+      height={40}
+      width={40}
+      viewBox="0 0 76 76"
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      baseProfile="full"
+      enableBackground="new 0 0 76.00 76.00"
+      fill="#000000"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        {" "}
+        <path
+          fill="#e7d513"
+          fillOpacity="1"
+          strokeWidth="0.2"
+          strokeLinejoin="round"
+          d="M 17.4167,32.25L 32.9107,32.25L 38,18L 43.0893,32.25L 58.5833,32.25L 45.6798,41.4944L 51.4583,56L 38,48.0833L 26.125,56L 30.5979,41.7104L 17.4167,32.25 Z "
+        ></path>{" "}
+      </g>
+    </svg>
+  );
 
   const getData = async () => {
     const api_url = process.env.API_URL;
     const api_key = process.env.API_KEY;
     try {
+      setLoader(true);
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await axios.get(
-        `http://api.giphy.com/v1/gifs/search?q=${searchText}&api_key=GlVGYHkr3WSBnllca54iNt0yFbjz7L65&limit=5`
+        `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
       );
+
       const data = response.data;
       console.log(38, data.data);
       setData(data.data);
-    } catch (error) {
-      console.log("ERROR: ", error);
+      setLoader(false);
+    } catch (error: any) {
+      // console.log("ERROR: ", error);
+      toast.error(error.message);
     }
   };
 
   // useEffect(() => {
+  //   // setSearchText('rose');
   //   getData();
   // }, []);
 
-  const searchHandle = (event: any) => {
+  const searchHandle = async (event: any) => {
     setSearchText(event.target.value);
+    setLoader(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    getData();
+    setCurrentPage(1);
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
+    setLoader(true);
+    setCurrentPage(1);
     getData();
     console.log(searchText);
   };
 
   return (
-    <div className="min-h-screen min-w-full bg-pink-50 mt-20 ">
+    <div className="min-h-screen min-w-full   bg-pink-50 mt-20 ">
       <div className=" p-2 md:p-10 bg-pink-100  mx-4 md:mx-20 mt-5">
         <form onSubmit={handleSubmit} className="flex gap-3">
           <div className="flex  w-full">
-            <div className="absolute pt-3 px-2">
+            <div className="absolute pt-3 px-2 ">
               <svg
                 height={20}
                 width={20}
@@ -109,59 +159,120 @@ const Homepage = () => {
         </form>
       </div>
 
-      {data.length != 0 ? (
-        <div className="h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
-          <div className="flex flex-row gap-5">
-            {data.map((item: any) => (
-              <Card key={item.id} className="w-full">
+      {loader ? (
+        <div className="h-full flex items-center  p-2 md:p-10 bg-pink-100  mx-4 justify-center  md:mx-20  gap-5 overflow-hidden">
+          <Loading />
+        </div>
+      ) : data.length != 0 ? (
+        <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
+          <div className="flex flex-wrap justify-center  gap-8">
+            {currentItems.map((item: any) => (
+              <Card key={item.id}>
                 <img
                   src={item.images.original.url}
                   height={""}
                   width={""}
                   alt="images"
-                  className=" h-28 min-w-full rounded-lg"
+                  className=" h-48 min-w-full  rounded-lg"
                 />
 
                 <CardHeader>
-                  {/* <CardTitle>{item.title}</CardTitle> */}
-                  <CardTitle>{item.title}</CardTitle>
-                  {/* <CardDescription>{item.username}</CardDescription> */}
+                  {/* {favorite ? heartSVG : favoriteGIF} */}
+                  <CardTitle className="p-0 m-0">{favSVG}</CardTitle>
+                  <CardTitle className={inter.className}>
+                    {item.title}
+                  </CardTitle>
                 </CardHeader>
-                {/* <CardContent>
-              <p>Card Content</p>
-              </CardContent>
-              <CardFooter>
-              <p>Card Footer</p>
-              </CardFooter> */}
+                <CardContent>{`@${item.username}`}</CardContent>
               </Card>
             ))}
           </div>
           {data.length != 0 && (
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <PaginationSection
+              totalItems={data.length}
+              itemsPerPage={itemsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
           )}
         </div>
-      ) : (
-        <div className="h-full flex items-center  p-2 md:p-10 bg-pink-100  mx-4 justify-center  md:mx-20  gap-5 overflow-hidden">
-          <Loading />
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };
+
+function PaginationSection({
+  totalItems,
+  itemsPerPage,
+  currentPage,
+  setCurrentPage,
+}: {
+  totalItems: any;
+  itemsPerPage: any;
+  currentPage: any;
+  setCurrentPage: any;
+}) {
+  let pages = [];
+  for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+    pages.push(i);
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      console.log(currentPage);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < pages.length) {
+      setCurrentPage(currentPage + 1);
+      console.log(currentPage);
+    }
+  };
+
+  const hanglePage = (currentPage: any) => {
+    if (currentPage < totalItems / itemsPerPage + 2) {
+      setCurrentPage(currentPage);
+      console.log(totalItems);
+      console.log(currentPage);
+    }
+  };
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious onClick={() => handlePrevPage()} />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink
+            className="hover:bg-pink-300 cursor-pointer"
+            onClick={() => hanglePage(currentPage)}
+          >
+            {currentPage}
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink
+            className="hover:bg-pink-300 cursor-pointer"
+            onClick={() => hanglePage(currentPage + 1)}
+          >
+            {currentPage + 1}
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink
+            className="hover:bg-pink-300 cursor-pointer"
+            onClick={() => hanglePage(currentPage + 3)}
+          >
+            {currentPage + 2}
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationNext onClick={() => handleNextPage()} />
+      </PaginationContent>
+    </Pagination>
+  );
+}
 
 export default Homepage;

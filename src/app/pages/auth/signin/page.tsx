@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+// import { auth } from "@/firebase/config";
 import { auth } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -39,40 +40,46 @@ const Signin = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const user = await signInWithEmailAndPassword(
-        values.email,
-        values.password
-      )
-        .then((res) => {
-          toast.success("Successfully login");
-          localStorage.setItem("email", values.email);
-          router.push("/");
-          console.log(res);
-        })
-        .catch((error) => {
-          toast.error("Login failed");
-          console.log(error);
-        });
-    } catch (error) {
-      toast.error("catch error");
-      console.log(error);
-    }
-
     // try {
     //   const user = await signInWithEmailAndPassword(
     //     values.email,
     //     values.password
-    //   );
-    //   toast.success("Login successfull");
-    //   localStorage.setItem("email", values.email);
-    //   router.push("/");
+    //   )
+    //     .then((res) => {
+    //       toast.success("Successfully login");
+    //       localStorage.setItem("email", values.email);
+    //       console.log(res);
+    //       router.push("/");
+    //     })
+    //     .catch((error) => {
+    //       toast.error("Login failed");
+    //       console.log(error);
+    //     });
+
     //   console.log({ user });
     // } catch (error) {
-    //   toast.error("Signing failed");
+    //   toast.error("catch error");
     //   console.log(error);
     // }
-    // console.log(values);
+
+    try {
+      console.log({ email: values.email, password: values.password });
+      const user = await signInWithEmailAndPassword(
+        values.email,
+        values.password
+      ).then(() => {
+        toast.success("Login successfull");
+        router.push("/");
+      });
+      localStorage.setItem("user", values.email);
+      router.push("/");
+
+      console.log({ user });
+    } catch (error) {
+      toast.error("Signing failed");
+      console.log(error);
+    }
+    console.log(values);
   };
 
   return (

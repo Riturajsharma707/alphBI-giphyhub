@@ -1,15 +1,28 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+// import {} from 'react-firebase-hooks/auth'
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
-  const [user, setUser] = useState<String>("");
+  const [user, setUser] = useState("");
 
-  useEffect(() => {
-    const userName = localStorage.getItem("name");
-    console.log(userName);
-  }, []);
+  // useEffect(() => {
+  //   const userName = localStorage.getItem("user")?.toString();
+  //   setUser(userName);
+  //   console.log(userName);
+  // }, []);
+
+  const hangleLogout = () => {
+    try {
+      localStorage.clear();
+      toast.success("Successfully logout");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="w-full fixed p-3 top-0 item-center text-center bg-slate-700 text-white h-20 flex justify-between ">
@@ -25,12 +38,29 @@ const Navbar = () => {
         >
           Favorites
         </Link>
-        <Link
+        {/* <Link
           href="/pages/auth/signin"
           className="hover:text-blue-300 active:text-yellow-500"
         >
-          {user ? user : "Login"}
-        </Link>
+          {user ? <Logout /> : "Login"}
+        </Link> */}
+
+        {user ? (
+          <Link
+            href="/"
+            className="hover:text-blue-300 active:text-yellow-500"
+            onClick={hangleLogout}
+          >
+            Logout
+          </Link>
+        ) : (
+          <Link
+            href="/pages/auth/signin"
+            className="hover:text-blue-300 active:text-yellow-500"
+          >
+            Login
+          </Link>
+        )}
       </div>
 
       {/* <div className="flex flex-col gap-2 sm:hidden "> */}
@@ -57,5 +87,20 @@ const Navbar = () => {
     // </div>
   );
 };
+
+// const Logout = () => {
+//   const router = useRouter();
+//   const handleLogout = () => {
+//     try {
+//       localStorage.removeItem("user");
+//       router.push("/");
+//       toast.success("Successfully logout");
+//     } catch (error: any) {
+//       toast.error(error.message);
+//     }
+//   };
+
+//   return <p onClick={handleLogout}>Logout</p>;
+// };
 
 export default Navbar;

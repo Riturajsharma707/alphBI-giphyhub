@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+// import { auth } from "@/firebase/config";
 import { auth } from "@/firebase/config";
 import { useRouter } from "next/navigation";
 
@@ -51,8 +52,8 @@ const Signup = () => {
           values.password
         );
         toast.success("Sign up has been successfull");
-        localStorage.setItem("name", values.name);
-        router.push("/");
+        localStorage.setItem("user", values.name);
+        router.push("/pages/auth/signin");
         console.log({ user });
       } catch (error) {
         toast.error("Signup failed");
