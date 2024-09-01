@@ -18,6 +18,9 @@ import Loading from "@/components/ui/loading";
 import { toast } from "react-toastify";
 import heartSVG from "../../../../public/addFavorite.svg";
 import favoriteGIF from "../../../../public/favorites.svg";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { title } from "process";
 
 interface card {
   id: number;
@@ -38,6 +41,7 @@ const Homepage = () => {
   const [loader, setLoader] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [favorite, setFavorite] = useState<any[]>([]);
 
   const lastItemIndex = currentPage * itemsPerPage;
   const firstItemIndex = lastItemIndex - itemsPerPage;
@@ -80,7 +84,9 @@ const Homepage = () => {
       setLoader(true);
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await axios.get(
-        `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
+        `${api_url}?q=${
+          searchText != "" ? searchText : "rose"
+        }&api_key=${api_key}&limit=50`
       );
 
       const data = response.data;
@@ -88,18 +94,16 @@ const Homepage = () => {
       setData(data.data);
       setLoader(false);
     } catch (error: any) {
-      // console.log("ERROR: ", error);
       toast.error(error.message);
     }
   };
 
-  // useEffect(() => {
-  //   // setSearchText('rose');
-  //   getData();
-  // }, []);
+  useEffect(() => {
+    getData();
+  }, []);
 
   const searchHandle = async (event: any) => {
-    setSearchText(event.target.value);
+    setSearchText(event.target.values);
     setLoader(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -114,8 +118,41 @@ const Homepage = () => {
     console.log(searchText);
   };
 
+  const addDataToFirebase = async (id: any, title: any, url: any) => {
+    console.log(id, title, url);
+    try {
+      const colle = await addDoc(collection(db, "favorite"), {
+        item_id: id,
+        title: title,
+        src: url,
+      });
+      console.log({ collection: colle });
+      return true;
+    } catch (error: any) {
+      console.log("ERROR::", error);
+      return false;
+    }
+  };
+
+  const handleFavorite = async (item: any) => {
+    console.log(item);
+    const added = await addDataToFirebase(
+      item.id,
+      item.title,
+      item.images.original.url
+    );
+    if (added) {
+      toast.success("Item successfully added");
+      console.log(added);
+    } else {
+      toast.error("Failed to add");
+    }
+    // setFavorite([...favorite, item]);
+    console.log("favorite", favorite);
+  };
+
   return (
-    <div className="min-h-screen min-w-full   bg-pink-50 mt-20 ">
+    <div className="min-h-full min-w-full bg-pink-50 mt-20 ">
       <div className=" p-2 md:p-10 bg-pink-100  mx-4 md:mx-20 mt-5">
         <form onSubmit={handleSubmit} className="flex gap-3">
           <div className="flex  w-full">
@@ -172,13 +209,19 @@ const Homepage = () => {
                   src={item.images.original.url}
                   height={""}
                   width={""}
-                  alt="images"
+                  alt={item.title}
                   className=" h-48 min-w-full  rounded-lg"
                 />
 
                 <CardHeader>
-                  {/* {favorite ? heartSVG : favoriteGIF} */}
-                  <CardTitle className="p-0 m-0">{favSVG}</CardTitle>
+                  {/* <CardTitle className="cursor-pointer"> */}
+                  <abbr
+                    title="Click to add in favorite"
+                    onClick={() => handleFavorite(item)}
+                  >
+                    {favSVG}
+                  </abbr>
+                  {/* </CardTitle> */}
                   <CardTitle className={inter.className}>
                     {item.title}
                   </CardTitle>
@@ -187,6 +230,7 @@ const Homepage = () => {
               </Card>
             ))}
           </div>
+
           {data.length != 0 && (
             <PaginationSection
               totalItems={data.length}

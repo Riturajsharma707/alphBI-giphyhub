@@ -5,7 +5,7 @@ import Homepage from "./pages/home/page";
 
 export default function Home() {
   return (
-    <main className="bg-mainColor w-full h-screen">
+    <main className="bg-mainColor w-full h-full">
       <Homepage />
     </main>
   );

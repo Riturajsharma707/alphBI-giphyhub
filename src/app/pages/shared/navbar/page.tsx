@@ -88,19 +88,4 @@ const Navbar = () => {
   );
 };
 
-// const Logout = () => {
-//   const router = useRouter();
-//   const handleLogout = () => {
-//     try {
-//       localStorage.removeItem("user");
-//       router.push("/");
-//       toast.success("Successfully logout");
-//     } catch (error: any) {
-//       toast.error(error.message);
-//     }
-//   };
-
-//   return <p onClick={handleLogout}>Logout</p>;
-// };
-
 export default Navbar;
