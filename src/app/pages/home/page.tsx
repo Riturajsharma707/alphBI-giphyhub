@@ -102,8 +102,8 @@ const Homepage = () => {
   );
 
   const getData = async () => {
-    const api_url = process.env.API_URL;
-    const api_key = process.env.API_KEY;
+    const api_url = "http://api.giphy.com/v1/gifs/search";
+    const api_key = "GlVGYHkr3WSBnllca54iNt0yFbjz7L65";
     try {
       setLoader(true);
       await new Promise((resolve) => setTimeout(resolve, 3000));
