@@ -103,7 +103,7 @@ const Homepage = () => {
   );
 
   const getData = async (searchText: any) => {
-    const api_url = "http://api.giphy.com/v1/gifs/search";
+    const api_url = "https://api.giphy.com/v1/gifs/search";
     const api_key = "GlVGYHkr3WSBnllca54iNt0yFbjz7L65";
     try {
       setLoader(true);
