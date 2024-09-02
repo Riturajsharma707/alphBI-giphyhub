@@ -83,7 +83,7 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-w-full  min-h-full bg-pink-50">
+    <div className="min-w-full  min-h-screen bg-pink-50">
       <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
         <div className="flex flex-wrap justify-center  gap-8">
           {favorite.map((fav: any) => (

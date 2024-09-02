@@ -112,9 +112,9 @@ const Homepage = () => {
       );
 
       // console.log(`${api_url}?q=${searchText}&api_key=${api_key}&limit=50`);
-      const data = response.data;
-      // console.log(38, data.data);
-      setData(data.data);
+      const res = response.data;
+      console.log(38, res.data);
+      setData(res.data);
       setLoader(false);
     } catch (error: any) {
       toast.error(error.message);
@@ -167,7 +167,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-full min-w-full bg-pink-50 mt-20 ">
+    <div className="min-h-screen min-w-full bg-pink-50 mt-20 ">
       <div className=" p-2 md:p-10 bg-pink-100  mx-4 md:mx-20 mt-5">
         <form onSubmit={handleSubmit} className="flex gap-3">
           <div className="flex  w-full">
