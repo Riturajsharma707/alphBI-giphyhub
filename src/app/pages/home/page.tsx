@@ -108,9 +108,7 @@ const Homepage = () => {
       setLoader(true);
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await axios.get(
-        `${api_url}?q=${
-          searchText != "" ? searchText : "rose"
-        }&api_key=${api_key}&limit=50`
+        `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
       );
 
       const data = response.data;
