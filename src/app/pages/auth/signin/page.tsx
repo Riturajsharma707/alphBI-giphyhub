@@ -105,7 +105,7 @@ const Signin = () => {
                 Login
               </Button>
               <p className="font-serif pt-2 ">
-                Don't have an account?
+                Don&apos;t forget to check this out?
                 <Link href="/pages/auth/signup" className="text-blue-400 px-1">
                   Signup
                 </Link>
