@@ -33,7 +33,8 @@ const inter = Inter({
 });
 
 const Homepage = () => {
-  const [searchText, setSearchText] = useState("rose");
+  const [searchText, setSearchText] = useState("trending");
+  const [debounced, setDebounced] = useState("");
   const [data, setData] = useState<card[]>([]);
   const [loader, setLoader] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,46 +102,54 @@ const Homepage = () => {
     </svg>
   );
 
-  const getData = async () => {
+  const getData = async (searchText: any) => {
     const api_url = "http://api.giphy.com/v1/gifs/search";
     const api_key = "GlVGYHkr3WSBnllca54iNt0yFbjz7L65";
     try {
       setLoader(true);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await axios.get(
         `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
       );
 
-      // console.log(`${api_url}?q=${searchText}&api_key=${api_key}&limit=50`);
+      console.log(`${api_url}?q=${searchText}&api_key=${api_key}&limit=50`);
       const res = response.data;
-      console.log(38, res.data);
       setData(res.data);
       setLoader(false);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (err: any) {
+      toast.error(err);
+    } finally {
+      setLoader(false);
     }
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    getData(searchText);
+  }, [debounced]);
+
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      setDebounced(searchText);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [searchText]);
 
   const searchHandle = async (event: any) => {
     event.preventDefault();
     setLoader(true);
-
     setSearchText(event.target.value);
-    await getData();
     setCurrentPage(1);
   };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    console.log(event);
+    console.log(event.target.value);
     setLoader(true);
     setCurrentPage(1);
-    setSearchText(event.target.value);
-
-    await getData();
+    // setSearchText(event.target.value);
   };
 
   const addDataToFirebase = async (item: any) => {
@@ -156,11 +165,9 @@ const Homepage = () => {
   };
 
   const handleFavorite = async (item: any) => {
-    // console.log(item);
     const added = await addDataToFirebase(item);
     if (added) {
       toast.success("Item successfully added");
-      // console.log(added);
     } else {
       toast.error("Failed to add");
     }
@@ -201,7 +208,7 @@ const Homepage = () => {
               <Input
                 placeholder="Article name or keywords..."
                 className="text-xl pl-10"
-                onKeyUp={searchHandle}
+                onChange={searchHandle}
               />
             </div>
           </div>
@@ -212,7 +219,7 @@ const Homepage = () => {
       </div>
 
       {loader ? (
-        <div className="h-full flex items-center  p-2 md:p-10 bg-pink-100  mx-4 justify-center  md:mx-20  gap-5 overflow-hidden">
+        <div className="h-full relative flex items-center  p-2 md:p-10 bg-pink-100  mx-4 justify-center  md:mx-20  gap-5 overflow-hidden">
           <Loading />
         </div>
       ) : data.length != 0 ? (
@@ -229,15 +236,13 @@ const Homepage = () => {
                 />
 
                 <CardHeader>
-                  {/* <CardTitle className="cursor-pointer"> */}
                   <abbr
-                    title="Click to add in favorite"
-                    className="cursor-pointer"
+                    className="cursor-pointer mt-2"
+                    title="Click to remove from favorite"
                     onClick={() => handleFavorite(item)}
                   >
-                    {item.favoriteAdded == true ? favSVG : addFav}
+                    {addFav}
                   </abbr>
-                  {/* </CardTitle> */}
                   <CardTitle className={inter.className}>
                     {item.title}
                   </CardTitle>
@@ -280,22 +285,18 @@ function PaginationSection({
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      console.log(currentPage);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < pages.length) {
       setCurrentPage(currentPage + 1);
-      console.log(currentPage);
     }
   };
 
   const hanglePage = (currentPage: any) => {
     if (currentPage < totalItems / itemsPerPage + 2) {
       setCurrentPage(currentPage);
-      console.log(totalItems);
-      console.log(currentPage);
     }
   };
 

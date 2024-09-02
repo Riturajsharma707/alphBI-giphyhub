@@ -54,10 +54,9 @@ const Signup = () => {
         toast.success("Sign up has been successfull");
         localStorage.setItem("user", values.name);
         router.push("/pages/auth/signin");
-        console.log({ user });
-      } catch (error) {
+      } catch (error: any) {
         toast.error("Signup failed");
-        console.log(error);
+        console.log(error.message);
       }
     }
   };

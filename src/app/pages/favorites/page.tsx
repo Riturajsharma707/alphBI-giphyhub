@@ -66,14 +66,12 @@ const Favorites = () => {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getFavoritesFromFirebase();
-      console.log(data);
       setFavorite(data);
     };
     fetchData();
   }, []);
 
   const handleFavorite = async (item: any) => {
-    console.log(item);
     const removedItem = await removeFavorite(item.id);
     if (removedItem) {
       toast.success("Item removed from favorite");

@@ -1,7 +1,5 @@
 import Homepage from "./pages/home/page";
-// import Footer from "./pages/shared/footer/page";
-// import Navbar from "./pages/shared/navbar/page";
-// import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
   return (
