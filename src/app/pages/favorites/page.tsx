@@ -5,6 +5,7 @@ import { db } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { Inter } from "next/font/google";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({
   weight: ["500", "700"],
@@ -22,9 +23,9 @@ const getFavoritesFromFirebase = async () => {
 const removeFavorite = async (id: any) => {
   try {
     await deleteDoc(doc(db, "favorite", id));
-    toast.success("Successfully item removed");
+    return true;
   } catch (e) {
-    toast.error("Failed to remove item");
+    return false;
   }
 };
 
@@ -60,6 +61,7 @@ const favSVG = (
 
 const Favorites = () => {
   const [favorite, setFavorite] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,32 +74,41 @@ const Favorites = () => {
 
   const handleFavorite = async (item: any) => {
     console.log(item);
+    const removedItem = await removeFavorite(item.id);
+    if (removedItem) {
+      toast.success("Item removed from favorite");
+    } else {
+      toast.error("Failed to remove");
+    }
   };
 
   return (
     <div className="min-w-full  min-h-full bg-pink-50">
       <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
         <div className="flex flex-wrap justify-center  gap-8">
-          {favorite.map((item: any) => (
-            <Card key={item.id}>
+          {favorite.map((fav: any) => (
+            <Card key={fav.id}>
               <img
-                src={item.src}
+                src={fav.item.images.original.url}
                 height={""}
                 width={""}
-                alt={item.title}
+                alt={fav.title}
                 className=" h-48 min-w-full  rounded-lg"
               />
 
               <CardHeader>
                 <abbr
+                  className="cursor-pointer"
                   title="Click to remove from favorite"
-                  onClick={() => handleFavorite(item)}
+                  onClick={() => handleFavorite(fav)}
                 >
                   {favSVG}
                 </abbr>
-                <CardTitle className={inter.className}>{item.title}</CardTitle>
+                <CardTitle className={inter.className}>
+                  {fav.item.title}
+                </CardTitle>
               </CardHeader>
-              <CardContent>{`@${item.username}`}</CardContent>
+              <CardContent>{`@${fav.item.username}`}</CardContent>
             </Card>
           ))}
         </div>

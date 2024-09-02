@@ -1,23 +1,25 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-// import {} from 'react-firebase-hooks/auth'
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const [user, setUser] = useState("");
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const userName = localStorage.getItem("user")?.toString();
-  //   setUser(userName);
-  //   console.log(userName);
-  // }, []);
+  useEffect(() => {
+    const loginUser = localStorage.getItem("user");
+    const userName = loginUser ? loginUser : "";
+    setUser(userName);
+    console.log(userName);
+  }, []);
 
   const hangleLogout = () => {
     try {
       localStorage.clear();
+      router.push("/pages/auth/signin");
       toast.success("Successfully logout");
     } catch (error: any) {
       toast.error(error.message);
@@ -38,16 +40,10 @@ const Navbar = () => {
         >
           Favorites
         </Link>
-        {/* <Link
-          href="/pages/auth/signin"
-          className="hover:text-blue-300 active:text-yellow-500"
-        >
-          {user ? <Logout /> : "Login"}
-        </Link> */}
 
-        {user ? (
+        {user != "" ? (
           <Link
-            href="/"
+            href="/pages/auth/signin"
             className="hover:text-blue-300 active:text-yellow-500"
             onClick={hangleLogout}
           >
@@ -63,7 +59,6 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* <div className="flex flex-col gap-2 sm:hidden "> */}
       <div
         className="flex flex-col gap-2 mt-4 sm:hidden"
         onClick={() => setVisible(!visible)}
@@ -74,17 +69,29 @@ const Navbar = () => {
 
         {visible ? (
           <div className="flex flex-col gap-2 bg-slate-800 rounded-md  p-3 ">
-            <Link href="/favorites" className="hover:text-blue-300">
+            <Link href="/pages/favorites" className="hover:text-blue-300">
               Favorites
             </Link>
-            <Link href="/pages/auth/signin" className="hover:text-blue-300">
-              Login
-            </Link>
+            {user != "" ? (
+              <Link
+                href="/pages/auth/signin"
+                className="hover:text-blue-300 active:text-yellow-500"
+                onClick={hangleLogout}
+              >
+                Logout
+              </Link>
+            ) : (
+              <Link
+                href="/pages/auth/signin"
+                className="hover:text-blue-300 active:text-yellow-500"
+              >
+                Login
+              </Link>
+            )}
           </div>
         ) : null}
       </div>
     </div>
-    // </div>
   );
 };
 

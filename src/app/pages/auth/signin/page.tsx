@@ -14,14 +14,22 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-// import { auth } from "@/firebase/config";
 import { auth } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+const login = async (email: string, password: string) => {
+  try {
+    const user = await signInWithEmailAndPassword(auth, email, password);
+    return true;
+  } catch (error: any) {
+    console.log("ERROR::", error.message);
+    return false;
+  }
+};
 
 const Signin = () => {
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
   const formSchema = z.object({
@@ -40,46 +48,15 @@ const Signin = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // try {
-    //   const user = await signInWithEmailAndPassword(
-    //     values.email,
-    //     values.password
-    //   )
-    //     .then((res) => {
-    //       toast.success("Successfully login");
-    //       localStorage.setItem("email", values.email);
-    //       console.log(res);
-    //       router.push("/");
-    //     })
-    //     .catch((error) => {
-    //       toast.error("Login failed");
-    //       console.log(error);
-    //     });
-
-    //   console.log({ user });
-    // } catch (error) {
-    //   toast.error("catch error");
-    //   console.log(error);
-    // }
-
-    try {
-      console.log({ email: values.email, password: values.password });
-      const user = await signInWithEmailAndPassword(
-        values.email,
-        values.password
-      ).then(() => {
-        toast.success("Login successfull");
-        router.push("/");
-      });
-      localStorage.setItem("user", values.email);
+    const { email, password } = values;
+    const user = await login(email, password);
+    if (user) {
+      toast.success("Login successfull");
+      localStorage.setItem("user", email);
       router.push("/");
-
-      console.log({ user });
-    } catch (error) {
-      toast.error("Signing failed");
-      console.log(error);
+    } else {
+      toast.error("Login failed! try again");
     }
-    console.log(values);
   };
 
   return (
@@ -100,7 +77,6 @@ const Signin = () => {
                   <FormControl>
                     <Input placeholder="Abcd@gmail.com" {...field} />
                   </FormControl>
-                  {/* <FormDescription>Enter valid email address</FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -119,7 +95,6 @@ const Signin = () => {
                       type={"password"}
                     />
                   </FormControl>
-                  {/* <FormDescription>Enter valid password</FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}

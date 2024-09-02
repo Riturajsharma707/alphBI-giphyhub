@@ -16,11 +16,8 @@ import {
 } from "@/components/ui/pagination";
 import Loading from "@/components/ui/loading";
 import { toast } from "react-toastify";
-import heartSVG from "../../../../public/addFavorite.svg";
-import favoriteGIF from "../../../../public/favorites.svg";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { title } from "process";
 
 interface card {
   id: number;
@@ -41,7 +38,6 @@ const Homepage = () => {
   const [loader, setLoader] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
-  const [favorite, setFavorite] = useState<any[]>([]);
 
   const lastItemIndex = currentPage * itemsPerPage;
   const firstItemIndex = lastItemIndex - itemsPerPage;
@@ -77,6 +73,34 @@ const Homepage = () => {
     </svg>
   );
 
+  const addFav = (
+    <svg
+      viewBox="0 0 32 32"
+      height={20}
+      width={20}
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="#000000"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        {" "}
+        <g id="icomoon-ignore"> </g>{" "}
+        <path
+          d="M19.38 12.803l-3.38-10.398-3.381 10.398h-11.013l8.925 6.397-3.427 10.395 8.896-6.448 8.895 6.448-3.426-10.395 8.925-6.397h-11.014zM20.457 19.534l2.394 7.261-6.85-4.965-6.851 4.965 2.64-8.005-0.637-0.456-6.228-4.464h8.471l2.606-8.016 2.605 8.016h8.471l-6.864 4.92 0.245 0.744z"
+          fill="#000000"
+        >
+          {" "}
+        </path>{" "}
+      </g>
+    </svg>
+  );
+
   const getData = async () => {
     const api_url = process.env.API_URL;
     const api_key = process.env.API_KEY;
@@ -90,7 +114,7 @@ const Homepage = () => {
       );
 
       const data = response.data;
-      console.log(38, data.data);
+      // console.log(38, data.data);
       setData(data.data);
       setLoader(false);
     } catch (error: any) {
@@ -103,10 +127,16 @@ const Homepage = () => {
   }, []);
 
   const searchHandle = async (event: any) => {
-    setSearchText(event.target.values);
     setLoader(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) =>
+      setTimeout(
+        resolve,
 
+        3000
+      )
+    );
+
+    setSearchText(event.target.values);
     getData();
     setCurrentPage(1);
   };
@@ -118,15 +148,11 @@ const Homepage = () => {
     console.log(searchText);
   };
 
-  const addDataToFirebase = async (id: any, title: any, url: any) => {
-    console.log(id, title, url);
+  const addDataToFirebase = async (item: any) => {
     try {
       const colle = await addDoc(collection(db, "favorite"), {
-        item_id: id,
-        title: title,
-        src: url,
+        item,
       });
-      console.log({ collection: colle });
       return true;
     } catch (error: any) {
       console.log("ERROR::", error);
@@ -135,20 +161,14 @@ const Homepage = () => {
   };
 
   const handleFavorite = async (item: any) => {
-    console.log(item);
-    const added = await addDataToFirebase(
-      item.id,
-      item.title,
-      item.images.original.url
-    );
+    // console.log(item);
+    const added = await addDataToFirebase(item);
     if (added) {
       toast.success("Item successfully added");
-      console.log(added);
+      // console.log(added);
     } else {
       toast.error("Failed to add");
     }
-    // setFavorite([...favorite, item]);
-    console.log("favorite", favorite);
   };
 
   return (
@@ -217,9 +237,10 @@ const Homepage = () => {
                   {/* <CardTitle className="cursor-pointer"> */}
                   <abbr
                     title="Click to add in favorite"
+                    className="cursor-pointer"
                     onClick={() => handleFavorite(item)}
                   >
-                    {favSVG}
+                    {item.favoriteAdded == true ? favSVG : addFav}
                   </abbr>
                   {/* </CardTitle> */}
                   <CardTitle className={inter.className}>
