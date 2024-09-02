@@ -33,7 +33,7 @@ const inter = Inter({
 });
 
 const Homepage = () => {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("rose");
   const [data, setData] = useState<card[]>([]);
   const [loader, setLoader] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +111,7 @@ const Homepage = () => {
         `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
       );
 
+      // console.log(`${api_url}?q=${searchText}&api_key=${api_key}&limit=50`);
       const data = response.data;
       // console.log(38, data.data);
       setData(data.data);
@@ -125,25 +126,21 @@ const Homepage = () => {
   }, []);
 
   const searchHandle = async (event: any) => {
+    event.preventDefault();
     setLoader(true);
-    await new Promise((resolve) =>
-      setTimeout(
-        resolve,
 
-        3000
-      )
-    );
-
-    setSearchText(event.target.values);
-    getData();
+    setSearchText(event.target.value);
+    await getData();
     setCurrentPage(1);
   };
-  const handleSubmit = (event: any) => {
+
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     setLoader(true);
     setCurrentPage(1);
-    getData();
-    console.log(searchText);
+    setSearchText(event.target.value);
+
+    await getData();
   };
 
   const addDataToFirebase = async (item: any) => {
@@ -203,8 +200,8 @@ const Homepage = () => {
             <div className="w-full">
               <Input
                 placeholder="Article name or keywords..."
-                onChange={searchHandle}
                 className="text-xl pl-10"
+                onKeyUp={searchHandle}
               />
             </div>
           </div>
