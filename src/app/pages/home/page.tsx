@@ -115,8 +115,8 @@ const Homepage = () => {
       const res = response.data;
       setData(res.data);
       setLoader(false);
-    } catch (err: any) {
-      toast.error(err);
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setLoader(false);
     }
@@ -174,7 +174,7 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-screen min-w-full bg-pink-50 mt-20 ">
+    <div className="min-h-screen min-w-full bg-pink-50 pt-10 ">
       <div className=" p-2 md:p-10 bg-pink-100  mx-4 md:mx-20 mt-5">
         <form onSubmit={handleSubmit} className="flex gap-3">
           <div className="flex  w-full">
@@ -237,8 +237,8 @@ const Homepage = () => {
 
                 <CardHeader>
                   <abbr
-                    className="cursor-pointer mt-2"
-                    title="Click to remove from favorite"
+                    className="cursor-pointer mt-2 hover:scale-150 transition-all"
+                    title="Click to add into favorite"
                     onClick={() => handleFavorite(item)}
                   >
                     {addFav}
@@ -247,7 +247,9 @@ const Homepage = () => {
                     {item.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>{`@${item.username}`}</CardContent>
+                <CardContent className="px-10">
+                  {item.username ? `@${item.username}` : null}
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -337,3 +339,4 @@ function PaginationSection({
 }
 
 export default Homepage;
+export { PaginationSection };

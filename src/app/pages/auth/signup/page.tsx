@@ -15,14 +15,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-// import { auth } from "@/firebase/config";
-import { auth } from "@/firebase/config";
+
 import { useRouter } from "next/navigation";
+import { signUp } from "@/firebase/firebaseSlice";
 
 const Signup = () => {
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
   const formSchema = z.object({
@@ -46,17 +43,13 @@ const Signup = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.confirm_password === values.password) {
-      try {
-        const user = await createUserWithEmailAndPassword(
-          values.email,
-          values.password
-        );
+      const user = await signUp(values.email, values.password);
+      console.log(user);
+      if (user.user) {
         toast.success("Sign up has been successfull");
-        localStorage.setItem("user", values.name);
         router.push("/pages/auth/signin");
-      } catch (error: any) {
-        toast.error("Signup failed");
-        console.log(error.message);
+      } else {
+        toast.error("sign up failed!");
       }
     }
   };

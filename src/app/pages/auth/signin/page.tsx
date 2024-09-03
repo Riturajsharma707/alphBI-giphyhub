@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +13,9 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { auth } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
-
-const login = async (email: string, password: string) => {
-  try {
-    const user = await signInWithEmailAndPassword(auth, email, password);
-    return true;
-  } catch (error: any) {
-    console.log("ERROR::", error.message);
-    return false;
-  }
-};
+import { login } from "@/firebase/firebaseSlice";
 
 const Signin = () => {
   const router = useRouter();
@@ -50,9 +38,9 @@ const Signin = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { email, password } = values;
     const user = await login(email, password);
-    if (user) {
+    if (user.user) {
       toast.success("Login successfull");
-      localStorage.setItem("user", email);
+      localStorage.setItem("userID", user.user.uid);
       router.push("/");
     } else {
       toast.error("Login failed! try again");
@@ -105,7 +93,7 @@ const Signin = () => {
                 Login
               </Button>
               <p className="font-serif pt-2 ">
-                Don&apos;t forget to check this out?
+                Don&apos;t have an account?
                 <Link href="/pages/auth/signup" className="text-blue-400 px-1">
                   Signup
                 </Link>
@@ -119,3 +107,4 @@ const Signin = () => {
 };
 
 export default Signin;
+export { login };

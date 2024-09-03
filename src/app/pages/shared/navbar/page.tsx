@@ -59,16 +59,16 @@ const Navbar = () => {
       </div>
 
       <div
-        className="flex flex-col gap-2 sm:hidden cursor-pointer"
+        className="flex flex-col mr-5 gap-2 sm:hidden cursor-pointer"
         onClick={() => setVisible(!visible)}
       >
-        <div className="h-[2px] w-8 bg-white"></div>
-        <div className="h-[2px] w-8 bg-white"></div>
-        <div className="h-[2px] w-8 bg-white"></div>
+        <div className="h-[2px] w-8 bg-white  active:bg-pink-300"></div>
+        <div className="h-[2px] w-8 bg-white  active:bg-pink-300"></div>
+        <div className="h-[2px] w-8 bg-white  active:bg-pink-300"></div>
       </div>
 
       {visible && (
-        <div className="absolute right-4 top-16 flex flex-col gap-2 bg-slate-800 rounded-sm p-3 sm:hidden">
+        <div className="absolute right-4 top-16 flex flex-col gap-2 bg-slate-800 rounded-sm p-3 sm:hidden ">
           <Link href="/pages/favorites" className="hover:text-blue-300">
             Favorites
           </Link>

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { PaginationSection } from "../home/page";
 
 const inter = Inter({
   weight: ["500", "700"],
@@ -62,6 +63,12 @@ const favSVG = (
 const Favorites = () => {
   const [favorite, setFavorite] = useState([]);
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+
+  const lastItemIndex = currentPage * itemsPerPage;
+  const firstItemIndex = lastItemIndex - itemsPerPage;
+  const currentItems = favorite.slice(firstItemIndex, lastItemIndex);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,10 +88,10 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-w-full  min-h-screen bg-pink-50">
+    <div className="min-w-full  min-h-screen bg-pink-50 pt-6">
       <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
         <div className="flex flex-wrap justify-center  gap-8">
-          {favorite.map((fav: any) => (
+          {currentItems.map((fav: any) => (
             <Card key={fav.id}>
               <img
                 src={fav.item.images.original.url}
@@ -96,8 +103,8 @@ const Favorites = () => {
 
               <CardHeader>
                 <abbr
-                  className="cursor-pointer"
-                  title="Click to remove from favorite"
+                  className="cursor-pointer hover:scale-150 transition-all"
+                  title="Click to remove from favorite "
                   onClick={() => handleFavorite(fav)}
                 >
                   {favSVG}
@@ -110,6 +117,14 @@ const Favorites = () => {
             </Card>
           ))}
         </div>
+        {favorite.length != 0 && (
+          <PaginationSection
+            totalItems={favorite.length}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
       </div>
     </div>
   );
