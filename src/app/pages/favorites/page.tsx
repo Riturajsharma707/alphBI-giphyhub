@@ -73,7 +73,6 @@ const Favorites = () => {
 
   const handleFavorite = async (item: any) => {
     const removedItem = await removeFavorite(item.id);
-    console.log(removedItem);
     if (removedItem) {
       toast.success("Item removed from favorite");
       window.location.reload();

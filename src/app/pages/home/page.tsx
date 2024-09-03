@@ -106,7 +106,6 @@ const Homepage = () => {
         `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
       );
 
-      console.log(`${api_url}?q=${searchText}&api_key=${api_key}&limit=50`);
       const res = response.data;
       setData(res.data);
       setLoader(false);
@@ -140,8 +139,7 @@ const Homepage = () => {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    console.log(event);
-    console.log(event.target.value);
+
     setLoader(true);
     setCurrentPage(1);
     // setSearchText(event.target.value);
@@ -150,7 +148,6 @@ const Homepage = () => {
   const handleFavorite = async (item: any) => {
     const docRef = await addDataToFirebase(item);
     setIsFavorite(!isFavorite);
-    console.log(docRef);
     if (docRef) {
       toast.success("Item successfully added");
     } else {
@@ -160,7 +157,6 @@ const Homepage = () => {
 
   const handleRemoveFavorite = async (item: any) => {
     const removedItem = await removeFavorite(item.id);
-    console.log(removedItem);
     setIsFavorite(!isFavorite);
 
     if (removedItem) {

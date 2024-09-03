@@ -44,7 +44,6 @@ const Signup = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.confirm_password === values.password) {
       const user = await signUp(values.email, values.password);
-      console.log(user);
       if (user.user) {
         toast.success("Sign up has been successfull");
         router.push("/pages/auth/signin");
