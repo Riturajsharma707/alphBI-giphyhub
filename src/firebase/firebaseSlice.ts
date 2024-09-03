@@ -1,10 +1,8 @@
-import { db, auth, app } from "./config";
+import { auth } from "./config";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-
-//login
 
 const login = async (email: string, password: string) => {
   try {
@@ -27,6 +25,7 @@ const signUp = async (email: string, password: string) => {
       email,
       password
     );
+
     return userCredential;
   } catch (error: any) {
     return error;

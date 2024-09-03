@@ -18,6 +18,7 @@ const Navbar = () => {
   const hangleLogout = () => {
     try {
       localStorage.clear();
+
       router.push("/pages/auth/signin");
       toast.success("Successfully logout");
     } catch (error: any) {
@@ -28,7 +29,7 @@ const Navbar = () => {
   return (
     <div className="w-full fixed p-3 top-0 text-center bg-slate-700 text-white h-20 flex justify-between items-center">
       <div className="uppercase font-serif h-full text-center hover:text-blue-400 cursor-pointer active:text-yellow-400 text-lg sm:text-2xl flex items-center">
-        <Link href="/">
+        <Link href="/" onClick={() => setVisible(false)}>
           <p className="shadow-xl shadow-black p-2">giphy store</p>
         </Link>
       </div>
@@ -40,7 +41,7 @@ const Navbar = () => {
         >
           Favorites
         </Link>
-        {user !== "" ? (
+        {user ? (
           <Link
             href="/pages/auth/signin"
             className="hover:text-blue-300 active:text-yellow-500"
@@ -69,14 +70,21 @@ const Navbar = () => {
 
       {visible && (
         <div className="absolute right-4 top-16 flex flex-col gap-2 bg-slate-800 rounded-sm p-3 sm:hidden ">
-          <Link href="/pages/favorites" className="hover:text-blue-300">
+          <Link
+            href="/pages/favorites"
+            className="hover:text-blue-300"
+            onClick={() => setVisible(!visible)}
+          >
             Favorites
           </Link>
           {user !== "" ? (
             <Link
               href="/pages/auth/signin"
               className="hover:text-blue-300 active:text-yellow-500"
-              onClick={hangleLogout}
+              onClick={() => {
+                hangleLogout;
+                setVisible(!visible);
+              }}
             >
               Logout
             </Link>
@@ -84,6 +92,7 @@ const Navbar = () => {
             <Link
               href="/pages/auth/signin"
               className="hover:text-blue-300 active:text-yellow-500"
+              onClick={() => setVisible(!visible)}
             >
               Login
             </Link>

@@ -107,4 +107,3 @@ const Signin = () => {
 };
 
 export default Signin;
-export { login };
