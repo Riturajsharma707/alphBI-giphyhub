@@ -10,7 +10,8 @@ const Navbar = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const loginUser = localStorage.getItem("user");
+    const loginUser = localStorage.getItem("userID");
+    console.log(loginUser);
     const userName = loginUser ? loginUser : "";
     setUser(userName);
   }, []);
@@ -18,7 +19,7 @@ const Navbar = () => {
   const hangleLogout = () => {
     try {
       localStorage.clear();
-
+      setVisible(false);
       router.push("/pages/auth/signin");
       toast.success("Successfully logout");
     } catch (error: any) {
@@ -43,7 +44,7 @@ const Navbar = () => {
         </Link>
         {user ? (
           <Link
-            href="/pages/auth/signin"
+            href=""
             className="hover:text-blue-300 active:text-yellow-500"
             onClick={hangleLogout}
           >
@@ -79,12 +80,9 @@ const Navbar = () => {
           </Link>
           {user !== "" ? (
             <Link
-              href="/pages/auth/signin"
+              href=""
               className="hover:text-blue-300 active:text-yellow-500"
-              onClick={() => {
-                hangleLogout;
-                setVisible(!visible);
-              }}
+              onClick={hangleLogout}
             >
               Logout
             </Link>

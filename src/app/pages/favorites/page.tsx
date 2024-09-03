@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { removeFavorite } from "@/firebase/firebaseSlice";
 
 import PaginationSection from "@/components/ui/PaginationSection";
 
@@ -20,15 +21,6 @@ const getFavoritesFromFirebase = async () => {
   const data: any = [];
   querySnapshot.forEach((doc: any) => data.push({ id: doc.id, ...doc.data() }));
   return data;
-};
-
-const removeFavorite = async (id: any) => {
-  try {
-    await deleteDoc(doc(db, "favorite", id));
-    return true;
-  } catch (e) {
-    return false;
-  }
 };
 
 const favSVG = (
@@ -81,6 +73,7 @@ const Favorites = () => {
 
   const handleFavorite = async (item: any) => {
     const removedItem = await removeFavorite(item.id);
+    console.log(removedItem);
     if (removedItem) {
       toast.success("Item removed from favorite");
     } else {
@@ -99,12 +92,12 @@ const Favorites = () => {
                 height={""}
                 width={""}
                 alt={fav.title}
-                className=" h-48 min-w-full  rounded-lg"
+                className=" h-48 min-w-full rounded-lg"
               />
 
               <CardHeader>
                 <abbr
-                  className="cursor-pointer hover:scale-150 transition-all"
+                  className="cursor-pointer hover:scale-150 transition-all active:animate-ping"
                   title="Click to remove from favorite "
                   onClick={() => handleFavorite(fav)}
                 >
@@ -114,7 +107,9 @@ const Favorites = () => {
                   {fav.item.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent>{`@${fav.item.username}`}</CardContent>
+              <CardContent>
+                {fav.item.username != "" ? `@${fav.item.username}` : ""}
+              </CardContent>
             </Card>
           ))}
         </div>

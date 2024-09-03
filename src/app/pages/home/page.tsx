@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
@@ -10,9 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaginationSection from "@/components/ui/PaginationSection";
 import Loading from "@/components/ui/loading";
 import { toast } from "react-toastify";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/firebase/config";
+import { removeFavorite } from "@/firebase/firebaseSlice";
 
+import { addDataToFirebase } from "@/firebase/firebaseSlice";
 interface card {
   id: number;
   title: string;
@@ -31,6 +31,7 @@ const Homepage = () => {
   const [debounced, setDebounced] = useState("");
   const [data, setData] = useState<card[]>([]);
   const [loader, setLoader] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
@@ -68,7 +69,7 @@ const Homepage = () => {
     </svg>
   );
 
-  const addFav = (
+  const addFavSVG = (
     <svg
       viewBox="0 0 32 32"
       height={20}
@@ -146,24 +147,26 @@ const Homepage = () => {
     // setSearchText(event.target.value);
   };
 
-  const addDataToFirebase = async (item: any) => {
-    try {
-      const colle = await addDoc(collection(db, "favorite"), {
-        item,
-      });
-      return true;
-    } catch (error: any) {
-      console.log("ERROR::", error);
-      return false;
-    }
-  };
-
   const handleFavorite = async (item: any) => {
-    const added = await addDataToFirebase(item);
-    if (added) {
+    const docRef = await addDataToFirebase(item);
+    setIsFavorite(!isFavorite);
+    console.log(docRef);
+    if (docRef) {
       toast.success("Item successfully added");
     } else {
       toast.error("Failed to add");
+    }
+  };
+
+  const handleRemoveFavorite = async (item: any) => {
+    const removedItem = await removeFavorite(item.id);
+    console.log(removedItem);
+    setIsFavorite(!isFavorite);
+
+    if (removedItem) {
+      toast.success("Item removed from favorite");
+    } else {
+      toast.error("Failed to remove");
     }
   };
 
@@ -230,19 +233,32 @@ const Homepage = () => {
                 />
 
                 <CardHeader>
-                  <abbr
-                    className="cursor-pointer mt-2 hover:scale-150 transition-all"
-                    title="Click to add into favorite"
-                    onClick={() => handleFavorite(item)}
-                  >
-                    {addFav}
-                  </abbr>
+                  {isFavorite ? (
+                    <abbr
+                      className="cursor-pointer hover:scale-150 transition-all active:animate-ping"
+                      title="Click to remove from favorite "
+                      onClick={() => {
+                        handleRemoveFavorite(item.id);
+                      }}
+                    >
+                      {favSVG}
+                    </abbr>
+                  ) : (
+                    <abbr
+                      className="cursor-pointer hover:scale-150 mt-3 transition-all active:animate-ping"
+                      title="Click to remove from favorite "
+                      onClick={() => handleFavorite(item)}
+                    >
+                      {addFavSVG}
+                    </abbr>
+                  )}
+
                   <CardTitle className={inter.className}>
                     {item.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-10">
-                  {item.username ? `@${item.username}` : null}
+                  {item.username != "" ? `@${item.username}` : null}
                 </CardContent>
               </Card>
             ))}
