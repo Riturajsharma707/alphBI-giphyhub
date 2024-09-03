@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/navigation";
-import { PaginationSection } from "../home/page";
+
+import PaginationSection from "@/components/ui/PaginationSection";
 
 const inter = Inter({
   weight: ["500", "700"],
