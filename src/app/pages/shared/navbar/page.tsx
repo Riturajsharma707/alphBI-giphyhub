@@ -43,13 +43,12 @@ const Navbar = () => {
           Favorites
         </Link>
         {user ? (
-          <Link
-            href=""
-            className="hover:text-blue-300 active:text-yellow-500"
+          <p
+            className="hover:text-blue-300 cursor-pointer active:text-yellow-500"
             onClick={hangleLogout}
           >
             Logout
-          </Link>
+          </p>
         ) : (
           <Link
             href="/pages/auth/signin"
@@ -79,13 +78,12 @@ const Navbar = () => {
             Favorites
           </Link>
           {user !== "" ? (
-            <Link
-              href=""
-              className="hover:text-blue-300 active:text-yellow-500"
+            <p
+              className="hover:text-blue-300 cursor-pointer active:text-yellow-500"
               onClick={hangleLogout}
             >
               Logout
-            </Link>
+            </p>
           ) : (
             <Link
               href="/pages/auth/signin"

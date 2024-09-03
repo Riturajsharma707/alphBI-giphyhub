@@ -76,6 +76,7 @@ const Favorites = () => {
     console.log(removedItem);
     if (removedItem) {
       toast.success("Item removed from favorite");
+      window.location.reload();
     } else {
       toast.error("Failed to remove");
     }

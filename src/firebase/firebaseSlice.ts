@@ -49,10 +49,10 @@ const addDataToFirebase = async (item: any) => {
 
 const removeFavorite = async (id: any) => {
   try {
-    const deletedDocRef = await deleteDoc(doc(db, "favorite", id));
-    return deletedDocRef;
+    await deleteDoc(doc(db, "favorite", id));
+    return true;
   } catch (error: any) {
-    return error.message;
+    return false;
   }
 };
 
