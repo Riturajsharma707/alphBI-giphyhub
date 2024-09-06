@@ -37,10 +37,10 @@ const Signin = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { email, password } = values;
-    const user = await login(email, password);
-    if (user.user) {
+    const loggedInUser = await login(email, password);
+    if (loggedInUser.user) {
       toast.success("Login successfull");
-      localStorage.setItem("userID", user.user.uid);
+      localStorage.setItem("userId", loggedInUser.user.uid);
       router.push("/");
     } else {
       toast.error("Login failed! try again");

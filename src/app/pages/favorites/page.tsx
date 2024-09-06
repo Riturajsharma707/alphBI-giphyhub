@@ -1,13 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/config";
 import { toast } from "react-toastify";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { Inter } from "next/font/google";
+import { getFavoritesFromFirebase } from "@/firebase/firebaseSlice";
 import { useRouter } from "next/navigation";
 import { removeFavorite } from "@/firebase/firebaseSlice";
-
+import Loading from "@/components/ui/loading";
 import PaginationSection from "@/components/ui/PaginationSection";
 
 const inter = Inter({
@@ -15,13 +14,6 @@ const inter = Inter({
 
   subsets: ["latin-ext"],
 });
-const getFavoritesFromFirebase = async () => {
-  const querySnapshot = await getDocs(collection(db, "favorite"));
-
-  const data: any = [];
-  querySnapshot.forEach((doc: any) => data.push({ id: doc.id, ...doc.data() }));
-  return data;
-};
 
 const favSVG = (
   <svg
@@ -56,6 +48,8 @@ const favSVG = (
 const Favorites = () => {
   const [favorite, setFavorite] = useState([]);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
@@ -65,63 +59,91 @@ const Favorites = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getFavoritesFromFirebase();
-      setFavorite(data);
+      setLoading(true);
+      const loggedInUser = localStorage.getItem("userId");
+      if (loggedInUser) {
+        const data = await getFavoritesFromFirebase(loggedInUser);
+        setUser(loggedInUser);
+        setFavorite(data);
+        setLoading(false);
+      } else {
+        toast.error("User not logged in");
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
 
   const handleFavorite = async (item: any) => {
-    const removedItem = await removeFavorite(item.id);
+    setLoading(true);
+    const removedItem = await removeFavorite(user, item.id);
     if (removedItem) {
       toast.success("Item removed from favorite");
+      // setLoading(false);
       window.location.reload();
     } else {
+      setLoading(false);
       toast.error("Failed to remove");
     }
   };
 
   return (
-    <div className="min-w-full  min-h-screen bg-pink-50 pt-6">
-      <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
-        <div className="flex flex-wrap justify-center  gap-8">
-          {currentItems.map((fav: any) => (
-            <Card key={fav.id}>
-              <img
-                src={fav.item.images.original.url}
-                height={""}
-                width={""}
-                alt={fav.title}
-                className=" h-48 min-w-full rounded-lg"
-              />
-
-              <CardHeader>
-                <abbr
-                  className="cursor-pointer hover:scale-150 transition-all active:animate-ping"
-                  title="Click to remove from favorite "
-                  onClick={() => handleFavorite(fav)}
-                >
-                  {favSVG}
-                </abbr>
-                <CardTitle className={inter.className}>
-                  {fav.item.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {fav.item.username != "" ? `@${fav.item.username}` : ""}
-              </CardContent>
-            </Card>
-          ))}
+    <div className="min-w-full min-h-screen bg-pink-50 pt-6">
+      {loading ? (
+        <div className="h-full relative flex items-center  p-2 md:p-10 bg-pink-100  mx-4 justify-center  md:mx-20  gap-5 overflow-hidden">
+          <Loading />
         </div>
-        {favorite.length != 0 && (
-          <PaginationSection
-            totalItems={favorite.length}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-        )}
-      </div>
+      ) : user != "" ? (
+        favorite.length != 0 ? (
+          <div className="min-h-full p-2 md:p-10 bg-pink-100  mx-4  md:mx-20 flex flex-wrap gap-5 overflow-hidden">
+            <div className="flex w-full flex-wrap justify-center  gap-8">
+              {currentItems.map((fav: any) => (
+                <Card key={fav.id}>
+                  <img
+                    src={fav.images.original.url}
+                    height={""}
+                    width={""}
+                    alt={fav.title}
+                    className=" h-48 min-w-full rounded-lg"
+                  />
+
+                  <CardHeader>
+                    <abbr
+                      className="cursor-pointer hover:scale-150 transition-all active:animate-ping"
+                      title="Click to remove from favorite "
+                      onClick={() => handleFavorite(fav)}
+                    >
+                      {favSVG}
+                    </abbr>
+                    <CardTitle className={inter.className}>
+                      {fav.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {fav.username != "" ? `@${fav.username}` : ""}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {favorite.length != 0 && (
+              <PaginationSection
+                totalItems={favorite.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="flex h-screen items-center justify-center text-center text-2xl font-semibold text-red-700 -mt-20">
+            <p>You don't have any favorite GIF</p>
+          </div>
+        )
+      ) : (
+        <div className="flex h-screen items-center text-center justify-center text-2xl font-semibold text-red-700 -mt-20">
+          <p>Login first</p>
+        </div>
+      )}
     </div>
   );
 };

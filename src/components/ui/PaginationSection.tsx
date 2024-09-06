@@ -49,6 +49,7 @@ function PaginationSection({
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
+            isActive={true}
             className="hover:bg-pink-300 cursor-pointer"
             onClick={() => hanglePage(currentPage)}
           >
@@ -57,6 +58,7 @@ function PaginationSection({
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
+            isActive={false}
             className="hover:bg-pink-300 cursor-pointer"
             onClick={() => hanglePage(currentPage + 1)}
           >
@@ -65,6 +67,7 @@ function PaginationSection({
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
+            isActive={false}
             className="hover:bg-pink-300 cursor-pointer"
             onClick={() => hanglePage(currentPage + 3)}
           >

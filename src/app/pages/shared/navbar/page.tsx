@@ -10,7 +10,7 @@ const Navbar = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const loginUser = localStorage.getItem("userID");
+    const loginUser = localStorage.getItem("userId");
     const userName = loginUser ? loginUser : "";
     setUser(userName);
   }, []);
@@ -27,7 +27,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="w-full fixed p-3 top-0 text-center bg-slate-700 text-white h-20 flex justify-between items-center">
+    <div className="w-full fixed p-3 top-0 text-center bg-slate-700 text-white h-20 flex justify-between items-center z-50">
       <div className="uppercase font-serif h-full text-center hover:text-blue-400 cursor-pointer active:text-yellow-400 text-lg sm:text-2xl flex items-center">
         <Link href="/" onClick={() => setVisible(false)}>
           <p className="shadow-xl shadow-black p-2">giphy store</p>
@@ -41,7 +41,7 @@ const Navbar = () => {
         >
           Favorites
         </Link>
-        {user ? (
+        {user != "" ? (
           <p
             className="hover:text-blue-300 cursor-pointer active:text-yellow-500"
             onClick={hangleLogout}
@@ -76,7 +76,7 @@ const Navbar = () => {
           >
             Favorites
           </Link>
-          {user !== "" ? (
+          {user != "" ? (
             <p
               className="hover:text-blue-300 cursor-pointer active:text-yellow-500"
               onClick={hangleLogout}

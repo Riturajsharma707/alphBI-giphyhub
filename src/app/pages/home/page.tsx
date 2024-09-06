@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PaginationSection from "@/components/ui/PaginationSection";
 import Loading from "@/components/ui/loading";
 import { toast } from "react-toastify";
-import { removeFavorite } from "@/firebase/firebaseSlice";
 
 import { addDataToFirebase } from "@/firebase/firebaseSlice";
 interface card {
@@ -27,47 +26,16 @@ const inter = Inter({
 });
 
 const Homepage = () => {
-  const [searchText, setSearchText] = useState("trending");
+  const [searchText, setSearchText] = useState("");
   const [debounced, setDebounced] = useState("");
   const [data, setData] = useState<card[]>([]);
   const [loader, setLoader] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
   const lastItemIndex = currentPage * itemsPerPage;
   const firstItemIndex = lastItemIndex - itemsPerPage;
   const currentItems = data.slice(firstItemIndex, lastItemIndex);
-
-  const favSVG = (
-    <svg
-      height={40}
-      width={40}
-      viewBox="0 0 76 76"
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      baseProfile="full"
-      enableBackground="new 0 0 76.00 76.00"
-      fill="#000000"
-    >
-      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-      <g
-        id="SVGRepo_tracerCarrier"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      ></g>
-      <g id="SVGRepo_iconCarrier">
-        {" "}
-        <path
-          fill="#e7d513"
-          fillOpacity="1"
-          strokeWidth="0.2"
-          strokeLinejoin="round"
-          d="M 17.4167,32.25L 32.9107,32.25L 38,18L 43.0893,32.25L 58.5833,32.25L 45.6798,41.4944L 51.4583,56L 38,48.0833L 26.125,56L 30.5979,41.7104L 17.4167,32.25 Z "
-        ></path>{" "}
-      </g>
-    </svg>
-  );
 
   const addFavSVG = (
     <svg
@@ -103,7 +71,9 @@ const Homepage = () => {
     try {
       setLoader(true);
       const response = await axios.get(
-        `${api_url}?q=${searchText}&api_key=${api_key}&limit=50`
+        `${api_url}?q=${
+          searchText != "" ? searchText : "treanding"
+        }&api_key=${api_key}&limit=50`
       );
 
       const res = response.data;
@@ -123,7 +93,7 @@ const Homepage = () => {
   useEffect(() => {
     const timeOut = setTimeout(() => {
       setDebounced(searchText);
-    }, 1000);
+    }, 2000);
 
     return () => {
       clearTimeout(timeOut);
@@ -137,32 +107,25 @@ const Homepage = () => {
     setCurrentPage(1);
   };
 
-  const handleSubmit = async (event: any) => {
+  const handleSubmit = (event: any) => {
     event.preventDefault();
-
     setLoader(true);
     setCurrentPage(1);
-    // setSearchText(event.target.value);
+    setSearchText(searchText);
   };
 
   const handleFavorite = async (item: any) => {
-    const docRef = await addDataToFirebase(item);
-    setIsFavorite(!isFavorite);
-    if (docRef) {
-      toast.success("Item successfully added");
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      const docRef = await addDataToFirebase(item, userId);
+      console.log(docRef);
+      if (docRef) {
+        toast.success("Item successfully added");
+      } else {
+        toast.error("Failed to add");
+      }
     } else {
-      toast.error("Failed to add");
-    }
-  };
-
-  const handleRemoveFavorite = async (item: any) => {
-    const removedItem = await removeFavorite(item.id);
-    setIsFavorite(!isFavorite);
-
-    if (removedItem) {
-      toast.success("Item removed from favorite");
-    } else {
-      toast.error("Failed to remove");
+      toast.error("Login first");
     }
   };
 
@@ -201,6 +164,7 @@ const Homepage = () => {
               <Input
                 placeholder="Article name or keywords..."
                 className="text-xl pl-10"
+                value={searchText}
                 onChange={searchHandle}
               />
             </div>
@@ -229,25 +193,15 @@ const Homepage = () => {
                 />
 
                 <CardHeader>
-                  {isFavorite ? (
-                    <abbr
-                      className="cursor-pointer hover:scale-150 transition-all active:animate-ping"
-                      title="Click to remove from favorite "
-                      onClick={() => {
-                        handleRemoveFavorite(item.id);
-                      }}
-                    >
-                      {favSVG}
-                    </abbr>
-                  ) : (
+                  {
                     <abbr
                       className="cursor-pointer hover:scale-150 mt-3 transition-all active:animate-ping"
-                      title="Click to remove from favorite "
+                      title="Add into favorite "
                       onClick={() => handleFavorite(item)}
                     >
                       {addFavSVG}
                     </abbr>
-                  )}
+                  }
 
                   <CardTitle className={inter.className}>
                     {item.title}
@@ -269,7 +223,11 @@ const Homepage = () => {
             />
           )}
         </div>
-      ) : null}
+      ) : (
+        <div className="flex min-h-screen items-center text-center justify-center text-2xl font-semibold text-red-700 -mt-20">
+          <p>GIF not found</p>
+        </div>
+      )}
     </div>
   );
 };

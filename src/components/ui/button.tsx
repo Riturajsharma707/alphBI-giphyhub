@@ -10,6 +10,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         newDefault: "bg-pink-400 text-primary-foreground hover:bg-pink-600",
+        activePage:
+          "border-b-pink-600 border-b-4 rounded-none bg-pink-300 hover:bg-pink-600",
+
         default:
           "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive:
