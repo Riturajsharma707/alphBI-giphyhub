@@ -136,7 +136,7 @@ const Favorites = () => {
           </div>
         ) : (
           <div className="flex h-screen items-center justify-center text-center text-2xl font-semibold text-red-700 -mt-20">
-            <p>You don't have any favorite GIF</p>
+            <p>You don&apos;t have any favorite GIF</p>
           </div>
         )
       ) : (
